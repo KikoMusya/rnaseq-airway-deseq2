@@ -1,0 +1,9 @@
+{
+  "dataset": "Bioconductor airway",
+  "input": "prepared gene-level count matrix",
+  "comparison": "dexamethasone treated vs untreated",
+  "n_genes_in_matrix": 33469,
+  "n_genes_after_filter_sum_ge_10": 22369,
+  "n_samples": 8,
+  "formal_de_note": "Run scripts/deseq2_airway.R before making final DE claims."
+}

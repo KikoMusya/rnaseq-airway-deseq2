@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RNA-seq mini-project visuals</title>
+<style>
+  :root {
+    --ink: #172033;
+    --muted: #53627a;
+    --paper: #fffaf0;
+    --rose: #e35a5a;
+    --blue: #2d7dd2;
+    --teal: #0e8f7e;
+    --aqua: #c8f4eb;
+    --gold: #ffd166;
+    --plum: #322653;
+    --line: rgba(23, 32, 51, 0.16);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #e7edf7;
+    color: var(--ink);
+    font-family: "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .frame {
+    width: 1400px;
+    height: 900px;
+    overflow: hidden;
+    position: relative;
+    background:
+      radial-gradient(circle at 12% 10%, rgba(255,209,102,.42), transparent 24%),
+      radial-gradient(circle at 88% 18%, rgba(200,244,235,.8), transparent 30%),
+      linear-gradient(135deg, #fffaf0 0%, #f4f8ff 52%, #eef8f5 100%);
+  }
+
+  .frame.dark {
+    background:
+      radial-gradient(circle at 15% 12%, rgba(227,90,90,.35), transparent 25%),
+      radial-gradient(circle at 80% 10%, rgba(45,125,210,.34), transparent 27%),
+      linear-gradient(135deg, #16162b 0%, #251b3f 48%, #103b43 100%);
+    color: #f8fbff;
+  }
+
+  .pad { padding: 64px; position: relative; z-index: 2; height: 100%; }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: rgba(14,143,126,.12);
+    color: #065f55;
+    border: 1px solid rgba(14,143,126,.24);
+    font-weight: 800;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    font-size: 14px;
+  }
+  .dark .badge {
+    background: rgba(255,255,255,.1);
+    color: #d9fff8;
+    border-color: rgba(255,255,255,.22);
+  }
+
+  h1 {
+    font-size: 78px;
+    line-height: .96;
+    margin: 28px 0 20px;
+    letter-spacing: -3px;
+  }
+  h2 {
+    font-size: 46px;
+    line-height: 1.03;
+    margin: 0 0 16px;
+    letter-spacing: -1.4px;
+  }
+  .subtitle {
+    max-width: 720px;
+    font-size: 25px;
+    line-height: 1.35;
+    color: var(--muted);
+  }
+  .dark .subtitle { color: #c8d3e8; }
+
+  .rna {
+    position: absolute;
+    right: 76px;
+    top: 120px;
+    width: 470px;
+    height: 600px;
+    opacity: .96;
+  }
+  .rna path { fill: none; stroke-width: 10; stroke-linecap: round; }
+  .rna .a { stroke: var(--rose); }
+  .rna .b { stroke: var(--blue); }
+  .rna line { stroke: rgba(23,32,51,.58); stroke-width: 5; stroke-linecap: round; }
+  .dark .rna line { stroke: rgba(255,255,255,.62); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; max-width: 760px; }
+  .chip {
+    padding: 12px 16px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.76);
+    border: 1px solid var(--line);
+    font-weight: 800;
+    color: #213047;
+  }
+  .dark .chip { background: rgba(255,255,255,.12); color: #eff7ff; border-color: rgba(255,255,255,.2); }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    position: absolute;
+    left: 64px;
+    right: 64px;
+    bottom: 60px;
+  }
+  .metric {
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    background: rgba(255,255,255,.76);
+    padding: 24px;
+    box-shadow: 0 30px 80px rgba(35,48,77,.12);
+  }
+  .dark .metric { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.18); }
+  .metric b { display: block; font-size: 34px; }
+  .metric span { color: var(--muted); font-weight: 700; }
+  .dark .metric span { color: #c8d3e8; }
+
+  .steps {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 22px;
+    margin-top: 34px;
+  }
+  .step {
+    min-height: 168px;
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    background: rgba(255,255,255,.76);
+    padding: 24px;
+    position: relative;
+  }
+  .step .num {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: var(--plum);
+    color: white;
+    font-weight: 900;
+    margin-bottom: 16px;
+  }
+  .step b { display: block; font-size: 22px; margin-bottom: 8px; }
+  .step p { margin: 0; color: var(--muted); line-height: 1.35; font-size: 17px; }
+  .path-title { font-size: 18px; font-weight: 900; color: var(--teal); text-transform: uppercase; letter-spacing: .1em; margin-top: 26px; }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: 1.02fr .98fr;
+    gap: 30px;
+    height: calc(100% - 120px);
+    margin-top: 28px;
+  }
+  .plot-card, .gene-card {
+    border-radius: 30px;
+    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(255,255,255,.09);
+    box-shadow: 0 30px 80px rgba(0,0,0,.22);
+    padding: 24px;
+  }
+  .mini-plot {
+    display: block;
+    width: 100%;
+    height: 300px;
+    border-radius: 20px;
+    background: #fffaf0;
+    margin-bottom: 18px;
+    overflow: hidden;
+  }
+  .plot-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  .plot-row .mini-plot { height: 250px; margin-bottom: 0; }
+  .gene-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .gene {
+    padding: 17px 18px;
+    border-radius: 18px;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.18);
+  }
+  .gene b { display: block; font-size: 24px; color: #ffffff; }
+  .gene span { color: #c8d3e8; font-size: 14px; }
+  .callout {
+    margin-top: 24px;
+    padding: 22px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, rgba(255,209,102,.95), rgba(227,90,90,.82));
+    color: #20131b;
+    font-size: 22px;
+    line-height: 1.28;
+    font-weight: 900;
+  }
+</style>
+</head>
+<body>
+<section class="frame" id="cover">
+  <div class="pad">
+    <div class="badge">RNA-seq mini-project</div>
+    <h1>Airway dexamethasone response</h1>
+    <p class="subtitle">A compact transcriptomics portfolio project: count matrix, normalization, PCA, volcano plot, heatmap, and differential-expression interpretation.</p>
+    <div class="chips">
+      <div class="chip">Bioconductor airway</div>
+      <div class="chip">4 treated vs 4 control</div>
+      <div class="chip">22,369 filtered genes</div>
+      <div class="chip">PCA + volcano + heatmap</div>
+      <div class="chip">DESeq2-ready</div>
+    </div>
+    <svg class="rna" viewBox="0 0 470 600" aria-hidden="true">
+      <path class="a" d="M150 40 C360 120 95 210 300 300 C470 374 130 430 330 560"/>
+      <path class="b" d="M300 40 C90 120 355 210 150 300 C-20 374 320 430 120 560"/>
+      <line x1="195" y1="92" x2="260" y2="92"/>
+      <line x1="160" y1="167" x2="310" y2="167"/>
+      <line x1="190" y1="248" x2="260" y2="248"/>
+      <line x1="160" y1="326" x2="305" y2="326"/>
+      <line x1="194" y1="414" x2="260" y2="414"/>
+      <line x1="150" y1="496" x2="310" y2="496"/>
+    </svg>
+    <div class="metrics">
+      <div class="metric"><b>8</b><span>samples</span></div>
+      <div class="metric"><b>33k</b><span>input genes</span></div>
+      <div class="metric"><b>7</b><span>known response genes</span></div>
+      <div class="metric"><b>3</b><span>portfolio plots</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="frame" id="workflow">
+  <div class="pad">
+    <div class="badge">analysis workflow</div>
+    <h2>Fast RNA-seq route: prepared counts now, raw FASTQ pipeline understood</h2>
+    <p class="subtitle">This project starts from a count matrix for speed, while documenting the standard raw-data path used in real production analyses.</p>
+    <div class="path-title">Quick portfolio path</div>
+    <div class="steps">
+      <div class="step"><div class="num">1</div><b>Count matrix</b><p>Load airway gene counts and sample metadata from Bioconductor workshop data.</p></div>
+      <div class="step"><div class="num">2</div><b>Normalize + explore</b><p>Median-ratio size factors, log2 counts, PCA, sample-level structure.</p></div>
+      <div class="step"><div class="num">3</div><b>Interpret DE signal</b><p>Volcano plot, top-gene heatmap, and glucocorticoid-response gene summary.</p></div>
+    </div>
+    <div class="path-title">Raw-data path I can explain</div>
+    <div class="steps">
+      <div class="step"><div class="num">A</div><b>FASTQ QC</b><p>FastQC and MultiQC to inspect read quality, adapters, duplication, and sample-level issues.</p></div>
+      <div class="step"><div class="num">B</div><b>Quantification</b><p>Salmon pseudoalignment or STAR alignment to generate gene/transcript counts.</p></div>
+      <div class="step"><div class="num">C</div><b>Formal DE</b><p>DESeq2, edgeR, or limma-voom with a clear design matrix and multiple-testing correction.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="frame dark" id="results">
+  <div class="pad">
+    <div class="badge">results snapshot</div>
+    <h2>Dexamethasone shifts airway gene expression in a coherent direction</h2>
+    <div class="results-grid">
+      <div class="plot-card">
+        <svg class="mini-plot" viewBox="0 0 640 300" aria-label="PCA plot">
+          <text x="24" y="36" font-size="22" font-weight="800" fill="#172033">PCA separates treated and untreated samples</text>
+          <line x1="74" y1="240" x2="590" y2="240" stroke="#64748b" stroke-width="2"/>
+          <line x1="74" y1="70" x2="74" y2="240" stroke="#64748b" stroke-width="2"/>
+          <circle cx="150" cy="126" r="11" fill="#2d7dd2"/><circle cx="186" cy="105" r="11" fill="#2d7dd2"/>
+          <circle cx="215" cy="141" r="11" fill="#2d7dd2"/><circle cx="132" cy="204" r="11" fill="#2d7dd2"/>
+          <circle cx="430" cy="132" r="11" fill="#e35a5a"/><circle cx="510" cy="118" r="11" fill="#e35a5a"/>
+          <circle cx="468" cy="204" r="11" fill="#e35a5a"/><circle cx="548" cy="146" r="11" fill="#e35a5a"/>
+          <text x="435" y="270" font-size="15" fill="#334155">PC1: treatment shift</text>
+          <circle cx="430" cy="48" r="7" fill="#2d7dd2"/><text x="445" y="53" font-size="14" fill="#334155">untreated</text>
+          <circle cx="530" cy="48" r="7" fill="#e35a5a"/><text x="545" y="53" font-size="14" fill="#334155">treated</text>
+        </svg>
+        <div class="plot-row">
+          <svg class="mini-plot" viewBox="0 0 320 250" aria-label="Volcano plot">
+            <text x="18" y="28" font-size="18" font-weight="800" fill="#172033">Volcano</text>
+            <line x1="38" y1="210" x2="294" y2="210" stroke="#64748b"/>
+            <line x1="38" y1="48" x2="38" y2="210" stroke="#64748b"/>
+            <g opacity=".65">
+              <circle cx="92" cy="188" r="3" fill="#2d7dd2"/><circle cx="106" cy="176" r="3" fill="#2d7dd2"/>
+              <circle cx="126" cy="194" r="3" fill="#94a3b8"/><circle cx="156" cy="202" r="3" fill="#94a3b8"/>
+              <circle cx="194" cy="184" r="3" fill="#e35a5a"/><circle cx="226" cy="169" r="3" fill="#e35a5a"/>
+              <circle cx="247" cy="93" r="4" fill="#e35a5a"/><circle cx="275" cy="72" r="4" fill="#e35a5a"/>
+              <circle cx="69" cy="126" r="4" fill="#2d7dd2"/><circle cx="83" cy="154" r="4" fill="#2d7dd2"/>
+            </g>
+            <line x1="125" y1="48" x2="125" y2="210" stroke="#f59e0b" stroke-dasharray="5 5"/>
+            <line x1="195" y1="48" x2="195" y2="210" stroke="#f59e0b" stroke-dasharray="5 5"/>
+            <text x="218" y="88" font-size="12" fill="#334155">SPARCL1</text>
+          </svg>
+          <svg class="mini-plot" viewBox="0 0 320 250" aria-label="Heatmap">
+            <text x="18" y="28" font-size="18" font-weight="800" fill="#172033">Top-gene heatmap</text>
+            <g transform="translate(70 54)">
+              <script type="application/ecmascript"><![CDATA[]]></script>
+              <rect x="0" y="0" width="28" height="14" fill="#8fb3ff"/><rect x="30" y="0" width="28" height="14" fill="#ffb189"/><rect x="60" y="0" width="28" height="14" fill="#8fb3ff"/><rect x="90" y="0" width="28" height="14" fill="#ffb189"/><rect x="120" y="0" width="28" height="14" fill="#8fb3ff"/><rect x="150" y="0" width="28" height="14" fill="#ffb189"/>
+              <rect x="0" y="17" width="28" height="14" fill="#9ebcff"/><rect x="30" y="17" width="28" height="14" fill="#ffc49f"/><rect x="60" y="17" width="28" height="14" fill="#94b7ff"/><rect x="90" y="17" width="28" height="14" fill="#ffb887"/><rect x="120" y="17" width="28" height="14" fill="#91b3ff"/><rect x="150" y="17" width="28" height="14" fill="#ffbc94"/>
+              <rect x="0" y="34" width="28" height="14" fill="#ffbd93"/><rect x="30" y="34" width="28" height="14" fill="#9ebcff"/><rect x="60" y="34" width="28" height="14" fill="#ffc49f"/><rect x="90" y="34" width="28" height="14" fill="#91b3ff"/><rect x="120" y="34" width="28" height="14" fill="#ffbd93"/><rect x="150" y="34" width="28" height="14" fill="#96b6ff"/>
+              <rect x="0" y="51" width="28" height="14" fill="#8fb3ff"/><rect x="30" y="51" width="28" height="14" fill="#ffb189"/><rect x="60" y="51" width="28" height="14" fill="#9ebcff"/><rect x="90" y="51" width="28" height="14" fill="#ffc49f"/><rect x="120" y="51" width="28" height="14" fill="#94b7ff"/><rect x="150" y="51" width="28" height="14" fill="#ffb887"/>
+              <rect x="0" y="68" width="28" height="14" fill="#ffbd93"/><rect x="30" y="68" width="28" height="14" fill="#91b3ff"/><rect x="60" y="68" width="28" height="14" fill="#ffbc94"/><rect x="90" y="68" width="28" height="14" fill="#96b6ff"/><rect x="120" y="68" width="28" height="14" fill="#ffc49f"/><rect x="150" y="68" width="28" height="14" fill="#8fb3ff"/>
+              <text x="-50" y="12" font-size="11" fill="#334155">ZBTB16</text><text x="-42" y="29" font-size="11" fill="#334155">KLF15</text><text x="-42" y="46" font-size="11" fill="#334155">FKBP5</text><text x="-30" y="63" font-size="11" fill="#334155">PER1</text><text x="-46" y="80" font-size="11" fill="#334155">DUSP1</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+      <div class="gene-card">
+        <p class="subtitle">Known glucocorticoid-response genes detected as increased in treated samples:</p>
+        <div class="gene-list">
+          <div class="gene"><b>ZBTB16</b><span>log2FC 7.13</span></div>
+          <div class="gene"><b>KLF15</b><span>log2FC 4.42</span></div>
+          <div class="gene"><b>FKBP5</b><span>log2FC 4.04</span></div>
+          <div class="gene"><b>PER1</b><span>log2FC 3.19</span></div>
+          <div class="gene"><b>TSC22D3</b><span>log2FC 3.18</span></div>
+          <div class="gene"><b>DUSP1</b><span>log2FC 2.95</span></div>
+          <div class="gene"><b>CRISPLD2</b><span>log2FC 2.63</span></div>
+        </div>
+        <div class="callout">Portfolio takeaway: starts with prepared counts for speed, but includes a DESeq2 script and raw FASTQ workflow literacy.</div>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+  const view = new URLSearchParams(window.location.search).get("view") || "cover";
+  document.querySelectorAll(".frame").forEach((frame) => {
+    frame.style.display = frame.id === view ? "block" : "none";
+  });
+</script>
+</body>
+</html>
